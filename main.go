@@ -2,115 +2,7 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 )
-
-func getName() string {
-	name := ""
-
-	fmt.Println("\nWelcome to Prince' Casino!!!")
-	fmt.Println("Let's Start Gambling!!")
-	fmt.Printf("\nPlease enter your name: ")
-
-	if _, err := fmt.Scanln(&name); err != nil {
-		return ""
-	}
-	fmt.Printf("\nWelcome %s, HAppy to have you here!\nLets Play!\n", name)
-
-	return name
-}
-
-func getBet(balance uint) uint {
-	var bet uint
-
-	for {
-		fmt.Printf("\n Enter your bet or 0 to quit (balance = %d): ", balance)
-		fmt.Scan(&bet)
-
-		if bet > balance {
-			fmt.Println("\nBet cannot be larger than the current balance")
-		} else {
-			break
-		}
-
-	}
-	return bet
-}
-
-func generateSymbols(symbols map[string]uint) []string {
-	arr := []string{}
-	for symbol, cnt := range symbols {
-		for i := 0; i < int(cnt); i++ {
-			arr = append(arr, symbol)
-		}
-	}
-
-	for i := len(arr) - 1; i > 0; i-- {
-		j := rand.Intn(i + 1)
-		arr[i], arr[j] = arr[j], arr[i]
-	}
-	// fmt.Println(arr)
-	return arr
-}
-
-func spinSlotMachine(reel []string, r int, c int) [][]string {
-	result := [][]string{}
-
-	for i := 0; i < r; i++ {
-		result = append(result, []string{})
-	}
-
-	for col := 0; col < c; col++ {
-		selected := map[int]bool{}
-		for row := 0; row < r; row++ {
-			for {
-				randomIndex := rand.Intn(len(reel)-1) + 0
-				_, exists := selected[randomIndex]
-				if !exists {
-					selected[randomIndex] = true
-					result[row] = append(result[row], reel[randomIndex])
-					break
-				}
-			}
-		}
-	}
-
-	return result
-}
-
-func displayWheels(spin [][]string) {
-	for _, row := range spin {
-		fmt.Println()
-		for j, symbol := range row {
-			fmt.Print(symbol)
-			if j != len(row)-1 {
-				fmt.Printf(" | ")
-			}
-		}
-	}
-	fmt.Println()
-}
-
-func checkWin(spin [][]string, multipliers map[string]uint) []uint {
-	lines := []uint{}
-
-	for _, row := range spin {
-		win := true
-		currSymbol := row[0]
-		for _, symbol := range row[1:] {
-			if currSymbol != symbol {
-				win = false
-				break
-			}
-		}
-		if win {
-			lines = append(lines, multipliers[currSymbol])
-		} else {
-			lines = append(lines, 0)
-		}
-	}
-	return lines
-}
 
 func main() {
 	symbols := map[string]uint{
@@ -129,22 +21,22 @@ func main() {
 		"X": 50,
 	}
 
-	name := getName()
+	name := GetName()
 
 	balance := uint(250)
 
-	symbolArr := generateSymbols(symbols)
+	symbolArr := GenerateSymbols(symbols)
 
 	for balance > 0 {
-		bet := getBet(balance)
+		bet := GetBet(balance)
 		if bet == 0 {
 			break
 		}
 		balance -= bet
 		// symbolArr := generateSymbols(symbols)
-		spin := spinSlotMachine(symbolArr, 3, 3)
-		displayWheels(spin)
-		winningLines := checkWin(spin, multiplier)
+		spin := SpinSlotMachine(symbolArr, 3, 3)
+		DisplayWheels(spin)
+		winningLines := CheckWin(spin, multiplier)
 		maxWin := uint(0)
 
 		for _, i := range winningLines {
